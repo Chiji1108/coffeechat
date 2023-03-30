@@ -1,0 +1,11 @@
+{
+  "apps": {
+    "shimokitacollege-hlab": {
+      "name": "shimokitacollege-hlab",
+      "app_id": "A050U7AH2CE",
+      "team_id": "T01DS6D3QL9",
+      "IsDev": false
+    }
+  },
+  "default": "shimokitacollege-hlab"
+}
