@@ -9,6 +9,9 @@ const MatchingWorkflow = DefineWorkflow({
       channel: {
         type: Schema.slack.types.channel_id,
       },
+      user: {
+        type: Schema.slack.types.user_id,
+      },
     },
     required: ["channel"],
   },
@@ -18,6 +21,7 @@ MatchingWorkflow.addStep(
   MatchingFunction,
   {
     channel: MatchingWorkflow.inputs.channel,
+    user: MatchingWorkflow.inputs.user,
   },
 );
 

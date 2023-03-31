@@ -11,6 +11,9 @@ const matchingTrigger: Trigger<typeof MatchingWorkflow.definition> = {
     channel: {
       value: "{{data.channel_id}}",
     },
+    user: {
+      value: "{{data.user_id}}",
+    },
   },
 };
 

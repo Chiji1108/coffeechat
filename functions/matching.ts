@@ -11,6 +11,9 @@ export const MatchingFunction = DefineFunction({
       channel: {
         type: Schema.slack.types.channel_id,
       },
+      user: {
+        type: Schema.slack.types.user_id,
+      },
     },
     required: ["channel"],
   },
@@ -19,7 +22,7 @@ export const MatchingFunction = DefineFunction({
 export default SlackFunction(
   MatchingFunction,
   async ({ inputs, client }) => {
-    const { channel } = inputs;
+    const { channel, user } = inputs;
 
     //Validation
     const channelResponse = await client.conversations.info({
@@ -29,34 +32,52 @@ export default SlackFunction(
       return { error: `Failed to get channel info: ${channelResponse.error}` };
     }
     if (!channelResponse.channel.is_channel) {
-      const response = await client.chat.postMessage({
-        channel,
-        text:
-          `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
-      });
-      if (!response.ok) {
-        return { error: `Failed to send message: ${response.error}` };
+      if (user) {
+        const response = await client.chat.postEphemeral({
+          channel,
+          text:
+            `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
+          user,
+        });
+        if (!response.ok) {
+          return { error: `Failed to send message: ${response.error}` };
+        }
+        return { outputs: {} };
+      } else {
+        const response = await client.chat.postMessage({
+          channel,
+          text:
+            `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
+        });
+        if (!response.ok) {
+          return { error: `Failed to send message: ${response.error}` };
+        }
+        return { outputs: {} };
       }
-      return {
-        outputs: {
-          // error: "",
-        },
-      };
     }
     if (channelResponse.channel.is_ext_shared) {
-      const response = await client.chat.postMessage({
-        channel,
-        text:
-          `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
-      });
-      if (!response.ok) {
-        return { error: `Failed to send message: ${response.error}` };
+      if (user) {
+        const response = await client.chat.postEphemeral({
+          channel,
+          text:
+            `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+          user,
+        });
+        if (!response.ok) {
+          return { error: `Failed to send message: ${response.error}` };
+        }
+        return { outputs: {} };
+      } else {
+        const response = await client.chat.postMessage({
+          channel,
+          text:
+            `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+        });
+        if (!response.ok) {
+          return { error: `Failed to send message: ${response.error}` };
+        }
+        return { outputs: {} };
       }
-      return {
-        outputs: {
-          // error: "",
-        },
-      };
     }
 
     const membersResponse = await client.conversations.members({ channel });
