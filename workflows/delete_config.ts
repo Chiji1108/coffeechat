@@ -3,21 +3,19 @@ import { DeleteConfigFunction } from "../functions/delete_config.ts";
 
 const DeleteConfigWorkflow = DefineWorkflow({
   callback_id: "delete_config_workflow",
-  title: "Delete config workflow",
+  title: "このチャンネルのスケジューラーを削除する",
   input_parameters: {
     properties: {
       channel: {
         type: Schema.slack.types.channel_id,
       },
+      user: {
+        type: Schema.slack.types.user_id,
+      },
     },
-    required: ["channel"],
+    required: ["channel", "user"],
   },
 });
-
-// DeleteConfigWorkflow.addStep(
-//   Schema.slack.functions.OpenForm,
-//   {},
-// );
 
 DeleteConfigWorkflow.addStep(
   DeleteConfigFunction,
@@ -30,7 +28,8 @@ DeleteConfigWorkflow.addStep(
   Schema.slack.functions.SendMessage,
   {
     channel_id: DeleteConfigWorkflow.inputs.channel,
-    message: `チャンネルを削除しました！`,
+    message:
+      `<@${DeleteConfigWorkflow.inputs.user}>さんがこのチャンネルのスケジューラーを削除しました🗑️`,
   },
 );
 

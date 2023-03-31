@@ -1,5 +1,11 @@
 {
   "apps": {
+    "alumni-smkt-college": {
+      "name": "alumni-smkt-college",
+      "app_id": "A0511BXFEAE",
+      "team_id": "T03MEFNPP1T",
+      "IsDev": false
+    },
     "shimokitacollege-hlab": {
       "name": "shimokitacollege-hlab",
       "app_id": "A050U7AH2CE",

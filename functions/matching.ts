@@ -21,6 +21,44 @@ export default SlackFunction(
   async ({ inputs, client }) => {
     const { channel } = inputs;
 
+    //Validation
+    const channelResponse = await client.conversations.info({
+      channel,
+    });
+    if (!channelResponse.ok) {
+      return { error: `Failed to get channel info: ${channelResponse.error}` };
+    }
+    if (!channelResponse.channel.is_channel) {
+      const response = await client.chat.postMessage({
+        channel,
+        text:
+          `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
+      });
+      if (!response.ok) {
+        return { error: `Failed to send message: ${response.error}` };
+      }
+      return {
+        outputs: {
+          // error: "",
+        },
+      };
+    }
+    if (channelResponse.channel.is_ext_shared) {
+      const response = await client.chat.postMessage({
+        channel,
+        text:
+          `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+      });
+      if (!response.ok) {
+        return { error: `Failed to send message: ${response.error}` };
+      }
+      return {
+        outputs: {
+          // error: "",
+        },
+      };
+    }
+
     const membersResponse = await client.conversations.members({ channel });
     if (!membersResponse.ok) {
       return {

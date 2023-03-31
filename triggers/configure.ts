@@ -4,8 +4,8 @@ import ConfigureWorkflow from "../workflows/configure.ts";
 
 const configureTrigger: Trigger<typeof ConfigureWorkflow.definition> = {
   type: "shortcut",
-  name: "このチャンネルのスケジューラーを設定する",
-  // description: "このチャンネルのスケジューラーを設定します",
+  name: "スケジューラー設定",
+  description: "このチャンネルのスケジューラーを設定する",
   workflow: `#/workflows/${ConfigureWorkflow.definition.callback_id}`,
   inputs: {
     interactivity: {

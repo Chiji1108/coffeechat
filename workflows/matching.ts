@@ -3,7 +3,7 @@ import { MatchingFunction } from "../functions/matching.ts";
 
 const MatchingWorkflow = DefineWorkflow({
   callback_id: "matching_workflow",
-  title: "Matching workflow",
+  title: "このチャンネルで一回限りのマッチングをする",
   input_parameters: {
     properties: {
       channel: {

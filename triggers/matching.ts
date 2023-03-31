@@ -4,7 +4,8 @@ import MatchingWorkflow from "../workflows/matching.ts";
 
 const matchingTrigger: Trigger<typeof MatchingWorkflow.definition> = {
   type: "shortcut",
-  name: "このチャンネルで一回限りのマッチングをする",
+  name: "1回だけマッチング",
+  description: "このチャンネルで一回限りのマッチングをする",
   workflow: `#/workflows/${MatchingWorkflow.definition.callback_id}`,
   inputs: {
     channel: {

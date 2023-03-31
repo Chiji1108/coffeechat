@@ -3,7 +3,7 @@ import { SaveMatchingTriggerFunction } from "../functions/save_matching_trigger.
 
 const ConfigureWorkflow = DefineWorkflow({
   callback_id: "configure_workflow",
-  title: "Configure workflow",
+  title: "このチャンネルのスケジューラーを設定する",
   input_parameters: {
     properties: {
       interactivity: {
@@ -23,8 +23,9 @@ const ConfigureWorkflow = DefineWorkflow({
 const InputForm = ConfigureWorkflow.addStep(
   Schema.slack.functions.OpenForm,
   {
-    title: "コーヒーチャット設定",
-    // submit_label: "上書き保存",
+    title: "このチャンネルのスケジューラーを設定する",
+    description: "コーヒーチャットのスケジューラーを設定します",
+    submit_label: "上書き保存",
     interactivity: ConfigureWorkflow.inputs.interactivity,
     fields: {
       elements: [

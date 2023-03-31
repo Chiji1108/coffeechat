@@ -79,6 +79,22 @@ export default SlackFunction(
         },
       };
     }
+    if (channelResponse.channel.is_ext_shared) {
+      const response = await client.chat.postEphemeral({
+        channel: triggered_channel,
+        text:
+          `コーヒーチャットの設定に失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+        user: triggered_user,
+      });
+      if (!response.ok) {
+        return { error: `Failed to send ephemeral message: ${response.error}` };
+      }
+      return {
+        outputs: {
+          // error: "",
+        },
+      };
+    }
     const startDate = new Date(start_time * 1000);
     if (startDate < new Date()) {
       const response = await client.chat.postEphemeral({

@@ -3,6 +3,7 @@ import MatchingHistoryDatastore from "./datastores/matching_history.ts";
 import ConfigureWorkflow from "./workflows/configure.ts";
 import MatchingWorkflow from "./workflows/matching.ts";
 import TriggerDatastore from "./datastores/trigger.ts";
+import DeleteConfigWorkflow from "./workflows/delete_config.ts";
 
 /**
  * The app manifest contains the app's configuration. This
@@ -13,10 +14,11 @@ export default Manifest({
   name: "Coffee Chat",
   description: "コーヒーチャットアプリ",
   icon: "assets/app_icon.png",
-  workflows: [ConfigureWorkflow, MatchingWorkflow],
+  workflows: [ConfigureWorkflow, MatchingWorkflow, DeleteConfigWorkflow],
   outgoingDomains: [],
   datastores: [MatchingHistoryDatastore, TriggerDatastore],
   botScopes: [
+    "conversations.connect:manage",
     "channels:read",
     "channels:manage",
     "groups:read",
