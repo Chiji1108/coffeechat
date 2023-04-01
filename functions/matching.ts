@@ -55,30 +55,30 @@ export default SlackFunction(
         return { outputs: {} };
       }
     }
-    if (channelResponse.channel.is_ext_shared) {
-      if (user) {
-        const response = await client.chat.postEphemeral({
-          channel,
-          text:
-            `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
-          user,
-        });
-        if (!response.ok) {
-          return { error: `Failed to send message: ${response.error}` };
-        }
-        return { outputs: {} };
-      } else {
-        const response = await client.chat.postMessage({
-          channel,
-          text:
-            `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
-        });
-        if (!response.ok) {
-          return { error: `Failed to send message: ${response.error}` };
-        }
-        return { outputs: {} };
-      }
-    }
+    // if (channelResponse.channel.is_ext_shared) {
+    //   if (user) {
+    //     const response = await client.chat.postEphemeral({
+    //       channel,
+    //       text:
+    //         `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+    //       user,
+    //     });
+    //     if (!response.ok) {
+    //       return { error: `Failed to send message: ${response.error}` };
+    //     }
+    //     return { outputs: {} };
+    //   } else {
+    //     const response = await client.chat.postMessage({
+    //       channel,
+    //       text:
+    //         `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+    //     });
+    //     if (!response.ok) {
+    //       return { error: `Failed to send message: ${response.error}` };
+    //     }
+    //     return { outputs: {} };
+    //   }
+    // }
 
     const membersResponse = await client.conversations.members({ channel });
     if (!membersResponse.ok) {
@@ -88,6 +88,11 @@ export default SlackFunction(
     }
 
     const unmatchedUsers: string[] = membersResponse.members;
+
+    const joinResponse = await client.conversations.join({ channel });
+    if (!joinResponse.ok) {
+      return { error: `Failed to join the channel: ${joinResponse.error}` };
+    }
 
     while (unmatchedUsers.length >= 2) {
       const userA = getRandom(unmatchedUsers);
@@ -207,9 +212,14 @@ export default SlackFunction(
       }
     }
 
+    const leaveResponse = await client.conversations.leave({ channel });
+    if (!leaveResponse.ok) {
+      return { error: `Failed to leave the channel: ${leaveResponse.error}` };
+    }
+
     const compMessageResponse = await client.chat.postMessage({
       channel: channel,
-      text: `マッチング完了しました🎉\nコーヒーチャットの写真の投稿待ってます✉️`,
+      text: `マッチング完了しました🎉\nコーヒーチャットの写真の投稿待ってます🖼️`,
     });
     if (!compMessageResponse.ok) {
       return {

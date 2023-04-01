@@ -35,14 +35,6 @@ export const SaveMatchingTriggerFunction = DefineFunction({
       "frequency",
     ],
   },
-  output_parameters: {
-    properties: {
-      // error: {
-      //   type: Schema.slack.types.rich_text,
-      // },
-    },
-    required: [],
-  },
 });
 
 export default SlackFunction(
@@ -51,7 +43,6 @@ export default SlackFunction(
     const {
       triggered_channel,
       triggered_user,
-      // delete_matching_history,
       frequency,
       start_time,
     } = inputs;
@@ -73,27 +64,7 @@ export default SlackFunction(
       if (!response.ok) {
         return { error: `Failed to send ephemeral message: ${response.error}` };
       }
-      return {
-        outputs: {
-          // error: "",
-        },
-      };
-    }
-    if (channelResponse.channel.is_ext_shared) {
-      const response = await client.chat.postEphemeral({
-        channel: triggered_channel,
-        text:
-          `コーヒーチャットの設定に失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
-        user: triggered_user,
-      });
-      if (!response.ok) {
-        return { error: `Failed to send ephemeral message: ${response.error}` };
-      }
-      return {
-        outputs: {
-          // error: "",
-        },
-      };
+      return { outputs: {} };
     }
     const startDate = new Date(start_time * 1000);
     if (startDate < new Date()) {

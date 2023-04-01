@@ -21,6 +21,7 @@ export default Manifest({
     "conversations.connect:manage",
     "channels:read",
     "channels:manage",
+    "channels:join",
     "groups:read",
     "groups:write",
     "im:read",

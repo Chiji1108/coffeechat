@@ -10,15 +10,18 @@ export const DeleteConfigFunction = DefineFunction({
       triggered_channel: {
         type: Schema.slack.types.channel_id,
       },
+      triggered_user: {
+        type: Schema.slack.types.user_id,
+      },
     },
-    required: ["triggered_channel"],
+    required: ["triggered_channel", "triggered_user"],
   },
 });
 
 export default SlackFunction(
   DeleteConfigFunction,
   async ({ inputs, client }) => {
-    const { triggered_channel } = inputs;
+    const { triggered_channel, triggered_user } = inputs;
     const previousTriggerResponse = await client.apps.datastore.get<
       typeof TriggerDatastore.definition
     >({
@@ -50,7 +53,30 @@ export default SlackFunction(
             `Failed to delete previous trigger: ${previousTriggerDeleteResponse.error}`,
         };
       }
+
+      const sendMessageResponse = await client.chat.postMessage({
+        channel: triggered_channel,
+        text:
+          `<@${triggered_user}>さんがこのチャンネルのスケジューラーを削除しました🗑️`,
+      });
+      if (!sendMessageResponse.ok) {
+        return {
+          error: `Failed to send message: ${sendMessageResponse.error}`,
+        };
+      }
+    } else {
+      const sendMessageResponse = await client.chat.postEphemeral({
+        channel: triggered_channel,
+        text: `このチャンネルにスケジューラーはまだ設定されてません🥲`,
+        user: triggered_user,
+      });
+      if (!sendMessageResponse.ok) {
+        return {
+          error: `Failed to send message: ${sendMessageResponse.error}`,
+        };
+      }
     }
+
     return { outputs: {} };
   },
 );

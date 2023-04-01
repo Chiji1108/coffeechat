@@ -21,15 +21,7 @@ DeleteConfigWorkflow.addStep(
   DeleteConfigFunction,
   {
     triggered_channel: DeleteConfigWorkflow.inputs.channel,
-  },
-);
-
-DeleteConfigWorkflow.addStep(
-  Schema.slack.functions.SendMessage,
-  {
-    channel_id: DeleteConfigWorkflow.inputs.channel,
-    message:
-      `<@${DeleteConfigWorkflow.inputs.user}>さんがこのチャンネルのスケジューラーを削除しました🗑️`,
+    triggered_user: DeleteConfigWorkflow.inputs.user,
   },
 );
 
