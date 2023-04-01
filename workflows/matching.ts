@@ -18,6 +18,15 @@ const MatchingWorkflow = DefineWorkflow({
 });
 
 MatchingWorkflow.addStep(
+  Schema.slack.functions.SendMessage,
+  {
+    channel_id: MatchingWorkflow.inputs.channel,
+    message:
+      `<@${MatchingWorkflow.inputs.user}>さんによってマッチングを開始します☕️`,
+  },
+);
+
+MatchingWorkflow.addStep(
   MatchingFunction,
   {
     channel: MatchingWorkflow.inputs.channel,
