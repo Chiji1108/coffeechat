@@ -4,6 +4,10 @@ import ConfigureWorkflow from "./workflows/configure.ts";
 import MatchingWorkflow from "./workflows/matching.ts";
 import TriggerDatastore from "./datastores/trigger.ts";
 import DeleteConfigWorkflow from "./workflows/delete_config.ts";
+import {
+  MatchingResultCustomType,
+  UsersCustomType,
+} from "./types/matching_result.ts";
 
 /**
  * The app manifest contains the app's configuration. This
@@ -15,6 +19,7 @@ export default Manifest({
   description: "コーヒーチャットアプリ",
   icon: "assets/app_icon.png",
   workflows: [ConfigureWorkflow, MatchingWorkflow, DeleteConfigWorkflow],
+  types: [MatchingResultCustomType, UsersCustomType],
   outgoingDomains: [],
   datastores: [MatchingHistoryDatastore, TriggerDatastore],
   botScopes: [

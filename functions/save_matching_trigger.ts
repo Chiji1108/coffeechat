@@ -48,24 +48,24 @@ export default SlackFunction(
     } = inputs;
 
     // Validation & データ整形
-    const channelResponse = await client.conversations.info({
-      channel: triggered_channel,
-    });
-    if (!channelResponse.ok) {
-      return { error: `Failed to get channel info: ${channelResponse.error}` };
-    }
-    if (!channelResponse.channel.is_channel) {
-      const response = await client.chat.postEphemeral({
-        channel: triggered_channel,
-        text:
-          `コーヒーチャットの設定に失敗しました😢\nグループやDMでは設定できません🗓️`,
-        user: triggered_user,
-      });
-      if (!response.ok) {
-        return { error: `Failed to send ephemeral message: ${response.error}` };
-      }
-      return { outputs: {} };
-    }
+    // const channelResponse = await client.conversations.info({
+    //   channel: triggered_channel,
+    // });
+    // if (!channelResponse.ok) {
+    //   return { error: `Failed to get channel info: ${channelResponse.error}` };
+    // }
+    // if (!channelResponse.channel.is_channel) {
+    //   const response = await client.chat.postEphemeral({
+    //     channel: triggered_channel,
+    //     text:
+    //       `コーヒーチャットの設定に失敗しました😢\nグループやDMでは設定できません🗓️`,
+    //     user: triggered_user,
+    //   });
+    //   if (!response.ok) {
+    //     return { error: `Failed to send ephemeral message: ${response.error}` };
+    //   }
+    //   return { outputs: {} };
+    // }
     const startDate = new Date(start_time * 1000);
     if (startDate < new Date()) {
       const response = await client.chat.postEphemeral({
@@ -78,11 +78,7 @@ export default SlackFunction(
         return { error: `Failed to send ephemeral message: ${response.error}` };
       }
 
-      return {
-        outputs: {
-          // error: "",
-        },
-      };
+      return { outputs: {} };
     }
     const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" })
       .format(

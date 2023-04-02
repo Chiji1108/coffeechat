@@ -1,9 +1,10 @@
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
 import { MatchingFunction } from "../functions/matching.ts";
+import { SendResultFunction } from "../functions/send_result.ts";
 
 const MatchingWorkflow = DefineWorkflow({
   callback_id: "matching_workflow",
-  title: "このチャンネルで一回限りのマッチングをする",
+  title: "マッチングをする",
   input_parameters: {
     properties: {
       channel: {
@@ -17,21 +18,17 @@ const MatchingWorkflow = DefineWorkflow({
   },
 });
 
-MatchingWorkflow.addStep(
-  Schema.slack.functions.SendMessage,
-  {
-    channel_id: MatchingWorkflow.inputs.channel,
-    message:
-      `<@${MatchingWorkflow.inputs.user}>さんによってマッチングを開始します☕️`,
-  },
-);
-
-MatchingWorkflow.addStep(
+const MatchingResult = MatchingWorkflow.addStep(
   MatchingFunction,
   {
     channel: MatchingWorkflow.inputs.channel,
     user: MatchingWorkflow.inputs.user,
   },
 );
+
+MatchingWorkflow.addStep(SendResultFunction, {
+  channel: MatchingWorkflow.inputs.channel,
+  matching_result: MatchingResult.outputs.matching_result,
+});
 
 export default MatchingWorkflow;

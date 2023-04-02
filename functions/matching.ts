@@ -1,6 +1,7 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import MatchingHistoryDatastore from "../datastores/matching_history.ts";
 import { getDifference, getRandom, removeItem } from "../utils/utils.ts";
+import { MatchingResultCustomType } from "../types/matching_result.ts";
 
 export const MatchingFunction = DefineFunction({
   callback_id: "matching_function",
@@ -17,6 +18,14 @@ export const MatchingFunction = DefineFunction({
     },
     required: ["channel"],
   },
+  output_parameters: {
+    properties: {
+      matching_result: {
+        type: MatchingResultCustomType,
+      },
+    },
+    required: ["matching_result"],
+  },
 });
 
 export default SlackFunction(
@@ -25,60 +34,54 @@ export default SlackFunction(
     const { channel, user } = inputs;
 
     //Validation
-    const channelResponse = await client.conversations.info({
-      channel,
-    });
-    if (!channelResponse.ok) {
-      return { error: `Failed to get channel info: ${channelResponse.error}` };
-    }
-    if (!channelResponse.channel.is_channel) {
-      if (user) {
-        const response = await client.chat.postEphemeral({
-          channel,
-          text:
-            `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
-          user,
-        });
-        if (!response.ok) {
-          return { error: `Failed to send message: ${response.error}` };
-        }
-        return { outputs: {} };
-      } else {
-        const response = await client.chat.postMessage({
-          channel,
-          text:
-            `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
-        });
-        if (!response.ok) {
-          return { error: `Failed to send message: ${response.error}` };
-        }
-        return { outputs: {} };
-      }
-    }
-    // if (channelResponse.channel.is_ext_shared) {
+    // const channelResponse = await client.conversations.info({
+    //   channel,
+    // });
+    // if (!channelResponse.ok) {
+    //   return { error: `Failed to get channel info: ${channelResponse.error}` };
+    // }
+    // if (!channelResponse.channel.is_channel) {
     //   if (user) {
     //     const response = await client.chat.postEphemeral({
     //       channel,
     //       text:
-    //         `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+    //         `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
     //       user,
     //     });
     //     if (!response.ok) {
     //       return { error: `Failed to send message: ${response.error}` };
     //     }
-    //     return { outputs: {} };
+    //     return {
+    //       error:
+    //         `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
+    //     };
     //   } else {
     //     const response = await client.chat.postMessage({
     //       channel,
     //       text:
-    //         `マッチングに失敗しました😢\n現在アラムナイを含むチャンネルではマッチングできません🚧`,
+    //         `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
     //     });
     //     if (!response.ok) {
     //       return { error: `Failed to send message: ${response.error}` };
     //     }
-    //     return { outputs: {} };
+    //     return {
+    //       error:
+    //         `マッチングに失敗しました😢\nグループやDMではマッチングできません🚧`,
+    //     };
     //   }
     // }
+
+    if (user) {
+      await client.chat.postMessage({
+        channel,
+        text: `<@${user}>さんによってマッチングを開始します☕️`,
+      });
+    } else {
+      await client.chat.postMessage({
+        channel,
+        text: `スケジューラーによりマッチングを開始します☕️`,
+      });
+    }
 
     const membersResponse = await client.conversations.members({ channel });
     if (!membersResponse.ok) {
@@ -87,32 +90,41 @@ export default SlackFunction(
       };
     }
 
+    const matchedGroups: string[][] = [];
     const unmatchedUsers: string[] = membersResponse.members;
 
-    const joinResponse = await client.conversations.join({ channel });
-    if (!joinResponse.ok) {
-      return { error: `Failed to join the channel: ${joinResponse.error}` };
+    const matchingHistory = new Map<string, string[]>();
+    const getMatchedUsers = async (
+      u: string,
+    ) => {
+      const datastoreResponse = await client.apps.datastore.get<
+        typeof MatchingHistoryDatastore.definition
+      >({
+        datastore: MatchingHistoryDatastore.name,
+        id: u,
+      });
+      if (!datastoreResponse.ok) {
+        throw new Error(
+          `Failed to access matching history datastore: ${datastoreResponse.error}`,
+        );
+      }
+      matchingHistory.set(u, datastoreResponse.item.matched_users ?? []);
+    };
+    try {
+      await Promise.all(
+        unmatchedUsers.map(getMatchedUsers),
+      );
+    } catch (error) {
+      return { error };
     }
 
     while (unmatchedUsers.length >= 2) {
       const userA = getRandom(unmatchedUsers);
-      const unmatchedUsersExceptA = unmatchedUsers.filter((u) => u != userA);
-
-      const getAResponse = await client.apps.datastore.get<
-        typeof MatchingHistoryDatastore.definition
-      >({
-        datastore: MatchingHistoryDatastore.name,
-        id: userA,
-      });
-      if (!getAResponse.ok) {
-        return {
-          error:
-            `Failed to access matching history datastore: ${getAResponse.error}`,
-        };
-      }
-      const matchedUsersForA = getAResponse.item.matched_users ?? [];
+      const matchedUsersForA = matchingHistory.get(userA);
+      if (!matchedUsersForA) return { error: `Map() Coding Error` };
       console.log("matchedUsersForA", matchedUsersForA);
 
+      const unmatchedUsersExceptA = unmatchedUsers.filter((u) => u != userA);
       const targetsForUserA: string[] = [];
       const difference = [
         ...getDifference(
@@ -127,106 +139,51 @@ export default SlackFunction(
       }
 
       const userB = getRandom(targetsForUserA);
-      console.log("userB", userB);
-
-      const getBResponse = await client.apps.datastore.get<
-        typeof MatchingHistoryDatastore.definition
-      >({
-        datastore: MatchingHistoryDatastore.name,
-        id: userB,
-      });
-      if (!getBResponse.ok) {
-        return { error: `Failed to get B response: ${getBResponse.error}` };
-      }
-      const matchedUsersForB = getBResponse.item.matched_users ?? [];
+      const matchedUsersForB = matchingHistory.get(userB);
+      if (!matchedUsersForB) return { error: `Map() Coding Error` };
       console.log("matchedUsersForB", matchedUsersForB);
-      const putAResponse = await client.apps.datastore.put<
-        typeof MatchingHistoryDatastore.definition
-      >({
-        datastore: MatchingHistoryDatastore.name,
-        item: {
-          user_id: userA,
-          matched_users: [...new Set([...matchedUsersForA, userB])],
-        },
-      });
-      if (!putAResponse.ok) {
-        return { error: `Failed to put A Response: ${putAResponse.error}` };
-      }
-      const putBResponse = await client.apps.datastore.put<
-        typeof MatchingHistoryDatastore.definition
-      >({
-        datastore: MatchingHistoryDatastore.name,
-        item: {
-          user_id: userB,
-          matched_users: [...new Set([...matchedUsersForB, userA])],
-        },
-      });
-      if (!putBResponse.ok) {
-        return { error: `Failed to put B Response: ${putBResponse.error}` };
-      }
-      const users = userA + "," + userB;
-      console.log("users", users);
-      const convOpenResponse = await client.conversations.open({
-        users,
-      });
-      if (!convOpenResponse.ok) {
-        return {
-          error:
-            `Failed to open conversation for ${users}: ${convOpenResponse.error}`,
-        };
-      }
-      const postMessageResponse = await client.chat.postMessage({
-        channel: convOpenResponse.channel.id,
-        text:
-          `<@${userA}>さん<@${userB}>さんこんにちは👋\n<#${channel}>のコーヒーチャットの時間です🎉\n2人の予定を合わせて楽しいコーヒーチャットを☕️`,
-      });
-      if (!postMessageResponse.ok) {
-        return {
-          error: `Failed to send message: ${postMessageResponse.error}`,
-        };
-      }
+
+      matchingHistory.set(userA, [...new Set([...matchedUsersForA, userB])]);
+      matchingHistory.set(userB, [...new Set([...matchedUsersForB, userA])]);
+      matchedGroups.push([userA, userB]);
+
       removeItem(unmatchedUsers, userA);
       removeItem(unmatchedUsers, userB);
     }
 
-    for (const user of unmatchedUsers) {
-      console.log("user", user);
-      const convOpenResponse = await client.conversations.open({
-        users: user,
+    const putMatchedUsers = async (u: string, users: string[]) => {
+      const putDatastoreResponse = await client.apps.datastore.put<
+        typeof MatchingHistoryDatastore.definition
+      >({
+        datastore: MatchingHistoryDatastore.name,
+        item: {
+          user_id: u,
+          matched_users: [...new Set(users)],
+        },
       });
-      if (!convOpenResponse.ok) {
-        return {
-          error:
-            `Failed to open conversation for ${user}: ${convOpenResponse.error}`,
-        };
+      if (!putDatastoreResponse.ok) {
+        throw new Error(
+          `Failed to put B Response: ${putDatastoreResponse.error}`,
+        );
       }
-      const postMessageResponse = await client.chat.postMessage({
-        channel: convOpenResponse.channel.id,
-        text:
-          `<#${channel}>のコーヒーチャットはマッチング運により今回お休みです☕️\n次回をお楽しみに👋`,
-      });
-      if (!postMessageResponse.ok) {
-        return {
-          error: `Failed to send message: ${postMessageResponse.error}`,
-        };
-      }
+    };
+    try {
+      await Promise.all(
+        Array.from(matchingHistory.entries()).map(([key, value]) =>
+          putMatchedUsers(key, value)
+        ),
+      );
+    } catch (error) {
+      return { error };
     }
 
-    const leaveResponse = await client.conversations.leave({ channel });
-    if (!leaveResponse.ok) {
-      return { error: `Failed to leave the channel: ${leaveResponse.error}` };
-    }
-
-    const compMessageResponse = await client.chat.postMessage({
-      channel: channel,
-      text: `マッチング完了しました🎉\nコーヒーチャットの写真の投稿待ってます🖼️`,
-    });
-    if (!compMessageResponse.ok) {
-      return {
-        error: `Failed to send message: ${compMessageResponse.error}`,
-      };
-    }
-
-    return { outputs: {} };
+    return {
+      outputs: {
+        matching_result: {
+          matched_groups: matchedGroups,
+          unmatched_users: unmatchedUsers,
+        },
+      },
+    };
   },
 );
