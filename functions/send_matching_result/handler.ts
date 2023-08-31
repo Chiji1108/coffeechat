@@ -93,15 +93,15 @@ export default SlackFunction(
     const unmatched_users_text = unmatched_users.map((user) => `<@${user}>`)
       .join(", ");
     const error_message = errorUsers.length > 0
-      ? `\nレート制限によりメッセージを送れなかったユーザー: \n` +
+      ? `\nレート制限によりDMを送れなかった人🙇\n` +
         errorUsers.map((u) => `<@${u}>`).join(", ")
       : "";
 
     const detailMessageResponse = await client.chat.postMessage({
       channel,
       thread_ts: compMessageResponse.ts,
-      text: `マッチングできたグループ: \n` + matched_groups_text +
-        "\nマッチングできなかったユーザー: \n" + unmatched_users_text +
+      text: `マッチング結果☕️\n` + matched_groups_text +
+        "\n今回お休みの人🍕\n" + unmatched_users_text +
         error_message,
     });
     if (detailMessageResponse.error) {

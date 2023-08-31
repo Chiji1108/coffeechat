@@ -235,6 +235,7 @@
     "https://deno.land/x/deno_slack_hooks@0.9.3/mod.ts": "db01fe4257cabbad6dbf514f5c1e340b0108472186586ce9e13f7c29828250ef",
     "https://deno.land/x/deno_slack_hooks@0.9.3/utilities.ts": "582bec87cb3498c25af47d17122be0d23da5215374be46edc2e3037d7288da0b",
     "https://deno.land/x/deno_slack_hooks@0.9.3/version.ts": "966b90e57f3699f2e3f604486678c32f8c87c549699dcffc600e214496eb1a2d",
+    "https://deno.land/x/deno_slack_hooks@1.1.0/build.ts": "f080d8c26b9a7723c1270be22253d04169363b8301101deacc1a1a37a6eb1a4e",
     "https://deno.land/x/deno_slack_hooks@1.1.0/check_update.ts": "3726ea1aaf78eb8b55bfb4f5dcafbf72a2f0b3d6cbbc800d29e40131cca05148",
     "https://deno.land/x/deno_slack_hooks@1.1.0/deps.ts": "01db4bca5d66b71196e0298c207e8c58bc2122312efe7e97b185a59a45af2504",
     "https://deno.land/x/deno_slack_hooks@1.1.0/get_manifest.ts": "4e2350e3629fc4e716689c09d9f4fda3d9bc9f7b0b952bd9afa6157e41c6b854",
