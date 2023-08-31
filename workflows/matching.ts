@@ -1,9 +1,11 @@
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
-import { MatchingFunction } from "../functions/matching.ts";
-import { SendResultFunction } from "../functions/send_result.ts";
+import { MatchingFunction } from "../functions/matching/definition.ts";
+import { SendMatchingResultFunction } from "../functions/send_matching_result/definition.ts";
+
+export const MATCHING_WORKFLOW_CALLBACK_ID = "matching_workflow";
 
 const MatchingWorkflow = DefineWorkflow({
-  callback_id: "matching_workflow",
+  callback_id: MATCHING_WORKFLOW_CALLBACK_ID,
   title: "マッチングをする",
   input_parameters: {
     properties: {
@@ -26,7 +28,7 @@ const MatchingResult = MatchingWorkflow.addStep(
   },
 );
 
-MatchingWorkflow.addStep(SendResultFunction, {
+MatchingWorkflow.addStep(SendMatchingResultFunction, {
   channel: MatchingWorkflow.inputs.channel,
   matching_result: MatchingResult.outputs.matching_result,
 });

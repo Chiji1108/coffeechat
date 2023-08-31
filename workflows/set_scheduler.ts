@@ -1,8 +1,10 @@
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
-import { SaveMatchingTriggerFunction } from "../functions/save_matching_trigger.ts";
+import { SetSchedulerFunction } from "../functions/set_scheduler/definition.ts";
 
-const ConfigureWorkflow = DefineWorkflow({
-  callback_id: "configure_workflow",
+export const SET_SCHEDULER_WORKFLOW_CALLBACK_ID = "set_scheduler_workflow";
+
+const SetSchedulerWorkflow = DefineWorkflow({
+  callback_id: SET_SCHEDULER_WORKFLOW_CALLBACK_ID,
   title: "このチャンネルのスケジューラーを設定する",
   input_parameters: {
     properties: {
@@ -20,13 +22,13 @@ const ConfigureWorkflow = DefineWorkflow({
   },
 });
 
-const InputForm = ConfigureWorkflow.addStep(
+const InputForm = SetSchedulerWorkflow.addStep(
   Schema.slack.functions.OpenForm,
   {
     title: "このチャンネルのスケジューラーを設定する",
     description: "コーヒーチャットのスケジューラーを設定します",
     submit_label: "上書き保存",
-    interactivity: ConfigureWorkflow.inputs.interactivity,
+    interactivity: SetSchedulerWorkflow.inputs.interactivity,
     fields: {
       elements: [
         // {
@@ -79,11 +81,11 @@ const InputForm = ConfigureWorkflow.addStep(
   },
 );
 
-ConfigureWorkflow.addStep(
-  SaveMatchingTriggerFunction,
+SetSchedulerWorkflow.addStep(
+  SetSchedulerFunction,
   {
-    triggered_user: ConfigureWorkflow.inputs.user,
-    triggered_channel: ConfigureWorkflow.inputs.channel,
+    triggered_user: SetSchedulerWorkflow.inputs.user,
+    triggered_channel: SetSchedulerWorkflow.inputs.channel,
     frequency: InputForm.outputs.fields.frequency,
     start_time: InputForm.outputs.fields.start_time,
     // delete_matching_history: InputForm.outputs.fields.delete_matching_history,
@@ -97,4 +99,4 @@ ConfigureWorkflow.addStep(
 //     `<@${ConfigureWorkflow.inputs.user}>さんがこのチャンネルでコーヒーチャットの設定をしました☕️\n${SaveMatchingTrigger.outputs.message}`,
 // });
 
-export default ConfigureWorkflow;
+export default SetSchedulerWorkflow;

@@ -1,13 +1,9 @@
 import { Manifest } from "deno-slack-sdk/mod.ts";
-import MatchingHistoryDatastore from "./datastores/matching_history.ts";
-import ConfigureWorkflow from "./workflows/configure.ts";
 import MatchingWorkflow from "./workflows/matching.ts";
-import TriggerDatastore from "./datastores/trigger.ts";
-import DeleteConfigWorkflow from "./workflows/delete_config.ts";
-import {
-  MatchingResultCustomType,
-  UsersCustomType,
-} from "./types/matching_result.ts";
+import { MatchingResultCustomType } from "./types/matching_result.ts";
+import SetSchedulerWorkflow from "./workflows/set_scheduler.ts";
+import UnsetSchedulerWorkflow from "./workflows/unset_scheduler.ts";
+import { UsersCustomType } from "./types/users.ts";
 
 /**
  * The app manifest contains the app's configuration. This
@@ -18,10 +14,10 @@ export default Manifest({
   name: "Coffee Chat",
   description: "コーヒーチャットアプリ",
   icon: "assets/app_icon.png",
-  workflows: [ConfigureWorkflow, MatchingWorkflow, DeleteConfigWorkflow],
+  workflows: [SetSchedulerWorkflow, MatchingWorkflow, UnsetSchedulerWorkflow],
   types: [MatchingResultCustomType, UsersCustomType],
   outgoingDomains: [],
-  datastores: [MatchingHistoryDatastore, TriggerDatastore],
+  // datastores: [MatchingHistoryDatastore, TriggerDatastore],
   botScopes: [
     "conversations.connect:manage",
     "channels:read",
@@ -35,8 +31,8 @@ export default Manifest({
     "mpim:write",
     "chat:write",
     "chat:write.public",
-    "datastore:read",
-    "datastore:write",
+    // "datastore:read",
+    // "datastore:write",
     "triggers:write",
     "triggers:read",
   ],

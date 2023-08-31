@@ -1,12 +1,5 @@
 import { DefineType, Schema } from "deno-slack-sdk/mod.ts";
-
-export const UsersCustomType = DefineType({
-  name: "Users",
-  type: Schema.types.array,
-  items: {
-    type: Schema.slack.types.user_id,
-  },
-});
+import { UsersCustomType, UsersType } from "./users.ts";
 
 export const MatchingResultCustomType = DefineType({
   name: "MatchingResult",
@@ -24,3 +17,8 @@ export const MatchingResultCustomType = DefineType({
   },
   required: ["matched_groups", "unmatched_users"],
 });
+
+export type MatchingResultType = {
+  matched_groups: UsersType[];
+  unmatched_users: string[];
+};

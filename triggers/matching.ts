@@ -1,20 +1,23 @@
 import { Trigger } from "deno-slack-api/types.ts";
 
-import MatchingWorkflow from "../workflows/matching.ts";
+import MatchingWorkflow, {
+  MATCHING_WORKFLOW_CALLBACK_ID,
+} from "../workflows/matching.ts";
+import { TriggerContextData, TriggerTypes } from "deno-slack-api/mod.ts";
 
-const matchingTrigger: Trigger<typeof MatchingWorkflow.definition> = {
-  type: "shortcut",
+const trigger: Trigger<typeof MatchingWorkflow.definition> = {
+  type: TriggerTypes.Shortcut,
   name: "1回だけマッチング",
   description: "このチャンネルで一回限りのマッチングをする",
-  workflow: `#/workflows/${MatchingWorkflow.definition.callback_id}`,
+  workflow: `#/workflows/${MATCHING_WORKFLOW_CALLBACK_ID}`,
   inputs: {
     channel: {
-      value: "{{data.channel_id}}",
+      value: TriggerContextData.Shortcut.channel_id,
     },
     user: {
-      value: "{{data.user_id}}",
+      value: TriggerContextData.Shortcut.user_id,
     },
   },
 };
 
-export default matchingTrigger;
+export default trigger;

@@ -1,16 +1,16 @@
 {
   "apps": {
-    "alumni-smkt-college": {
-      "name": "alumni-smkt-college",
-      "app_id": "A0511BXFEAE",
-      "team_id": "T03MEFNPP1T",
-      "IsDev": false
-    },
-    "shimokitacollege-hlab": {
-      "name": "shimokitacollege-hlab",
+    "T01DS6D3QL9": {
       "app_id": "A050U7AH2CE",
-      "team_id": "T01DS6D3QL9",
-      "IsDev": false
+      "IsDev": false,
+      "team_domain": "shimokitacollege-hlab",
+      "team_id": "T01DS6D3QL9"
+    },
+    "T03MEFNPP1T": {
+      "app_id": "A0511BXFEAE",
+      "IsDev": false,
+      "team_domain": "alumni-smkt-college",
+      "team_id": "T03MEFNPP1T"
     }
   },
   "default": "shimokitacollege-hlab"
