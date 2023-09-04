@@ -63,7 +63,10 @@ export default SlackFunction(
       };
     }
 
-    const membersResponse = await client.conversations.members({ channel });
+    const membersResponse = await client.conversations.members({
+      channel,
+      limit: 999,
+    });
     if (
       !membersResponse.ok || !membersResponse.members ||
       !Array.isArray(membersResponse.members)
