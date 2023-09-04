@@ -87,21 +87,23 @@ export default SlackFunction(
       };
     }
 
-    const matched_groups_text = matched_groups.map((users) =>
-      "- " + users.map((user) => `<@${user}>`).join(", ")
-    ).join("\n");
-    const unmatched_users_text = unmatched_users.map((user) => `<@${user}>`)
-      .join(", ");
+    const matched_groups_text = `マッチング結果☕️\n` +
+      matched_groups.map((users) =>
+        "- " + users.map((user) => `<@${user}>`).join(", ")
+      ).join("\n");
+    const unmatched_users_text = "\n\n今回お休みの人🍕\n" +
+      unmatched_users.map((user) => `<@${user}>`)
+        .join(", ");
     const error_message = errorUsers.length > 0
-      ? `\nレート制限によりDMを送れなかった人🙇\n` +
+      ? `\n\nレート制限によりDMを送れなかった人🙇\n` +
         errorUsers.map((u) => `<@${u}>`).join(", ")
       : "";
 
     const detailMessageResponse = await client.chat.postMessage({
       channel,
       thread_ts: compMessageResponse.ts,
-      text: `マッチング結果☕️\n` + matched_groups_text +
-        "\n今回お休みの人🍕\n" + unmatched_users_text +
+      text: matched_groups_text +
+        unmatched_users_text +
         error_message,
     });
     if (detailMessageResponse.error) {

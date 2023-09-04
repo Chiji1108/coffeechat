@@ -80,7 +80,8 @@ export default SlackFunction(
       channel,
       thread_ts: startMessageResponse.ts,
       text: `マッチング対象ユーザー: \n` +
-        members.map((u) => `<@${u}>`).join(", "),
+        members.map((u) => `<@${u}>`).join(", ") + "\n計" + members.length +
+        "人",
     });
     if (!membersMessageResponse.ok) {
       return {
