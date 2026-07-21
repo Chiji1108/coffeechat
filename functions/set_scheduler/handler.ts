@@ -91,7 +91,9 @@ export default SlackFunction(
         }),
       );
     } catch (error) {
-      return { error };
+      return {
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
 
     // トリガー作成
