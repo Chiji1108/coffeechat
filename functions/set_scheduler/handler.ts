@@ -1,9 +1,16 @@
 import { SlackFunction } from "deno-slack-sdk/mod.ts";
-import { WEEKDAYS } from "deno-slack-api/typed-method-types/workflows/triggers/scheduled.ts";
-type WeekdayUnion = typeof WEEKDAYS[keyof typeof WEEKDAYS];
 import MatchingWorkflow from "../../workflows/matching.ts";
 import { SetSchedulerFunction } from "./definition.ts";
 import { TriggerTypes } from "deno-slack-api/mod.ts";
+
+type Weekday =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
 
 export default SlackFunction(
   SetSchedulerFunction,
@@ -112,7 +119,7 @@ export default SlackFunction(
         frequency: {
           type: "weekly",
           on_days: [
-            weekday as WeekdayUnion,
+            weekday as Weekday,
           ],
           repeats_every: frequency,
         },

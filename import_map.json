@@ -1,6 +1,8 @@
 {
   "imports": {
-    "deno-slack-sdk/": "https://deno.land/x/deno_slack_sdk@2.2.0/",
-    "deno-slack-api/": "https://deno.land/x/deno_slack_api@2.1.1/"
+    "deno-slack-sdk/mod.ts": "jsr:@slack/sdk@2.15.2/mod.ts",
+    "deno-slack-sdk/types.ts": "jsr:@slack/sdk@2.15.2/types.ts",
+    "deno-slack-api/mod.ts": "jsr:@slack/api@2.9.0",
+    "deno-slack-api/types.ts": "jsr:@slack/api@2.9.0/types"
   }
 }
